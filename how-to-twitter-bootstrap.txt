@@ -1,0 +1,9 @@
+Gemfile:
+  gem 'twitter-bootstrap-rails'
+
+bundle install
+rails g bootstrap:install
+rails g bootstrap:layout application fixed
+rails g bootstrap:themed Posts
+
+

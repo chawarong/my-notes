@@ -1,0 +1,4 @@
+How to rails_best_practices
+- gem install rails_best_practices
+- cd [rails project]
+- rails_best_practices -f html .

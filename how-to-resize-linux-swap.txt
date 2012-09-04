@@ -1,0 +1,15 @@
+Use Gparted image
+Choose all default options
+ - Don't touch keymap
+ - US English [33]
+Delete swap partition
+Add Extended partition and add Logical partition underneath
+Apply
+
+Remove Gparted image
+Restart Ubuntu
+sudo -i 
+blkid << get the UUDI
+copy swap UUID to /etc/fstab by replacing with the new one
+swapon -a
+top to check

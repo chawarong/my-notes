@@ -1,0 +1,11 @@
+- Create an ubuntu virtual machine with 2GB RAM and accept all defaults (new hardisk, VDI, dynamic allocation, etc.) 
+- Start the VM, select "ubuntu-11.04-desktop-i386.iso" as an installer CD. Then, click start button to begin the installation.
+- Install Ubuntu using defaults, don't "download updates" and don't "install this third party software".
+- Select Erase disk and install Ubuntu
+- Give your full name and computer name and user name when asked.
+- After installation is complete. Shutdhow.
+- In VBox Settings, enable 3D graphic card
+- Select Devices >> Install Guest Additions, and click OK to the pop-up to install autorun.sh.
+- Restart
+
+

@@ -1,0 +1,5 @@
+copy encrypted text (in base64)  from database or somewhere and put it in a enc2.txt
+openssl enc -a -d -in enc2.txt -out enc2.txt.bin
+openssl rsautl -decrypt -inkey ./config/private.pem -in enc2.txt.bin -out dec.txt
+
+

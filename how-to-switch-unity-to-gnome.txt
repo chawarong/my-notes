@@ -1,0 +1,2 @@
+sudo apt-get install gnome-session-fallback
+http://www.groovypost.com/howto/ubuntu-11-10-switch-unity-to-gnome-desktop/

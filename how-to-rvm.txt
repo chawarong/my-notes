@@ -1,0 +1,40 @@
+cd [app_name]
+rvm install 1.9.3-head
+rvm --rvmrc --create use 1.9.3-head@script-runner
+gem install rails (-v x.x.x)
+rails new [app_name] 
+rails new [app_name] -d mysql
+vi Gemfile ;# put "gem 'mysql2'" and comment "gem 'sqlite3'"
+vi config/database.yml ;# config to use mysql and comment other sqlite3
+bundle install
+rails g scaffold Card name:string note:text position:integer color:string
+rake db:create
+rake db:migrate
+
+
+
+cd ~
+rvm list known
+rvm install 1.8.7
+sudo apt-get install nodejs
+sudo apt-get install libmagick9-dev
+gem install rake -v "0.9.2"
+
+$ cd credi
+$ rvm --rvmrc --create use 1.9.2-p290@trunk
+$ rvm use 1.8.7
+$ gem install rails -v "3.0.5"
+$ gem list -d rake
+$ gem install|update rake -v "0.8.7"
+$ gem list -d rake
+$ rvm use @global
+$ gem uninstall rake
+$ rvm use 1.8.7
+$ bundle install
+$ rake db:create
+(in /home/songserm/projects/credi)
+rake aborted!
+You have already activated rake 0.9.2, but your Gemfile requires rake 0.8.7. Using bundle exec may solve this.
+
+(See full trace by running task with --trace)
+$ bundle exec rake

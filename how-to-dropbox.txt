@@ -1,0 +1,9 @@
+http://www.liberiangeek.net/2012/04/install-dropbox-in-ubuntu-12-04-precise-pangolin/
+
+- Type these commands
+sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 5044912E
+sudo add-apt-repository "deb http://linux.dropbox.com/ubuntu $(lsb_release -sc) main"
+sudo apt-get update && sudo apt-get install nautilus-dropbox
+
+- Search for "Dropbox" on Dash home to launch first setup
+

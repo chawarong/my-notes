@@ -1,0 +1,7 @@
+Config according to this link
+http://efwsupport.com/index.php?topic=1359.0
+
+Setup crontab according to lightsquid/doc/install.txt #10
+
+More about cron 
+http://kb.endian.com/entry/43/

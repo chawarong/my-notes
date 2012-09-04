@@ -1,0 +1,8 @@
+How to task scheduler
+- create a basic task
+- input information, click next
+- select Daily, select time
+- start a program
+- select exe file by clicking Browse (copyto.exe /exec "C:\Users\Chawarong.S\Documents\CopyTo Backup Scripts\x220-backup.cp2")
+- put the arguments, click finish
+

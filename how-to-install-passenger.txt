@@ -1,0 +1,16 @@
+Support you have rvm up and running
+
+sudo apt-get install libopenssl-ruby apache2-prefork-dev
+gem install passenger
+sudo apt-get install libcurl4-openssl-dev
+rvmsudo passenger-install-apache2-module
+copy the following lines to /etc/apache2/apache2.conf
+
+==begin==
+LoadModule passenger_module /home/songserm/.rvm/gems/ruby-1.9.2-p290@naboo/gems/passenger-3.0.9/ext/apache2/mod_passenger.so
+PassengerRoot /home/songserm/.rvm/gems/ruby-1.9.2-p290@naboo/gems/passenger-3.0.9
+PassengerRuby /home/songserm/.rvm/wrappers/ruby-1.9.2-p290@naboo/ruby
+==end==
+
+
+

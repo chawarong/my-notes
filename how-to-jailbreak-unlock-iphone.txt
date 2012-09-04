@@ -1,0 +1,13 @@
+- Download Original firmware iOS 4.2.1 
+- Download Sn0wbreeze 2.2 
+- Download redsn0w 0.9.6b5
+- Follow the instruction on this web http://www.iphonemod.net/jailbreak-ios-4-2-1-using-sn0wbreeze-2-2.html
+- Once sn0wbreeze is complete, turn off the iphone to prepare for entering DFU
+- Let the iTunes to continue
+- Once iTunes is done with Jailbreak, unlock it with ultrasn0w (untethered)
+
+Reference:
+http://www.iphonemod.net/unlock-iphone-3g-3gs-ios-4-1-4-2-1-using-ultrans0w-1-2.html
+http://www.redmondpie.com/how-to-preserve-baseband-jailbreak-and-unlock-iphone-4-3gs-3g-on-ios-4.2.1-using-pwnagetool-4.2-sn0wbreeze-2.2-video/
+http://modmyi.com/forums/general-iphone-chat/264911-easy-way-exit-dfu-mode.html
+http://blog.iphone-dev.org/

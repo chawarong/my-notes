@@ -1,0 +1,19 @@
+== Upgrading firmware ==
+- download Alt-F-0.1RC1.bin
+- upgrade via web
+- follow http://code.google.com/p/alt-f/wiki/HowToUse
+- Service > network > smb > config delete unrelevant folderd
+- ssh to the host and edit /etc/samba/smb.conf the host alloww entry to include subnet /255.255.255.0
+- Save the settings by going to System > Settings > Flash Memory > Save Settings
+
+
+== Setting up Samba ==
+- create share from services > network > samba > configure
+- create user from setup > users
+  + add user
+  + add group
+  + map user & group
+- configure each share from services > network > samba > config > advanced
+  + specify valid users
+  + 
+- save config by going to System > Settings > Flash Memory > Save Settings

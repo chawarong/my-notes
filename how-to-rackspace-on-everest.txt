@@ -1,0 +1,69 @@
+On Ubuntu 12.04
+
+sudo apt-get update 
+
+sudo apt-get install build-essential bison openssl libncurses5-dev libreadline6 libreadline6-dev curl git-core git-gui zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake
+
+sudo apt-get install ruby1.9.1 ruby1.9.1-dev
+
+gem install rails
+
+apt-get install apache2
+
+apt-get install php5 libapache2-mod-php5
+
+sudo apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql
+
+apt-get install phpmyadmin
+
+apt-get install libmysql-ruby
+
+apt-get install libmysqlclient-dev
+
+gem install mysql2 
+
+apt-get install libcurl4-openssl-dev
+
+apt-get install apache2-prefork-dev
+
+passenger-install-apache2-module 
+
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:chris-lea/node.js
+sudo apt-get update
+sudo apt-get install nodejs
+
+add these to /etc/apache2/site-available/default
+- change port of default config (80) to port 81
+- add port 81 to /etc/apache2/ports.conf
+
+NameVirtualHost *:81
+Listen 81
+
+- add port 80
+
+<VirtualHost *:80>
+  DocumentRoot "/var/www/everest/public"
+  RailsEnv production
+  <Directory "/var/www/everest/public">
+    AllowOverride all
+    Options -MultiViews
+  </Directory>
+</VirtualHost>
+
+service apache2 stop
+
+cd /var/www/everest
+bundle install
+rake db:create RAILS_ENV=production
+rake db:migrate VERSION=0 RAILS_ENV=production
+rake db:migrate RAILS_ENV=production
+rake db:seed RAILS_ENV=production
+rake assets:clean RAILS_ENV=production
+rake assets:precomplie
+
+service apache2 start
+
+
+
+
