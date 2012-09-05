@@ -1,0 +1,23 @@
+how-to-miniprofiler.txt
+
+How to run mini profiler in "production"
+
+edit Gemfile
+gem 'rack-mini-profiler'
+
+Go to app/controllers# vi application_controller.rb
+
+add this line below "protect_from_forgery"
++ before_filter :miniprofiler
+
+add this line before the last "end"
+
++  protected
++  def miniprofiler
++    Rack::MiniProfiler.authorize_request
++  end
+
+mkdir -p ./tmp/miniprofiler
+chmod -R 777 ./tmp
+
+restart server
