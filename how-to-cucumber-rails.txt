@@ -1,0 +1,39 @@
+how-to-cucumber-rails.txt
+git clone git@git.atelas.com:everest/everest.git everest-cucumber
+git checkout develop
+cd everest-cucumber/
+rvm --rvmrc --create use 1.9.3-head@everest
+vi Gemfile 
+
+	group :test do
+	  gem 'cucumber-rails', :require => false
+	  # database_cleaner is not required, but highly recommended
+	  gem 'database_cleaner'
+	end
+
+bundle install
+(if error "Bundler could not find compatible versions for gem "actionpack" do this:
+   bundle update)
+
+rails generate cucumber:install --help
+rails generate cucumber:install 
+rails s
+rake cucumber
+
+-- cucumber is run in test environment and connected to db specified in config/database.yml
+
+  cucumber:
+  <<: *test
+
+  Note: 
+    * means point to an anchor alias (&test)
+    << means replace the content of the alias node (YML) to this line
+
+-- everytime rake cucumber is executed, it deletes the database and copy schema structures from development db without "ANY DATA" to make sure that db is in pristine state.
+
+-- one way is to seed data everytime, add to features/support/env.rb
+  
+  load "#{Rails.root}/db/seeds_master.rb"
+
+FOR REFERRENCE ONLY
+http://stackoverflow.com/questions/3049800/ruby-on-rails-cucumber-how-to-reset-the-db-after-each-scenario
