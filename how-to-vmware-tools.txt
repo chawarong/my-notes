@@ -1,0 +1,15 @@
+
+how-to-vmware-tools.txt
+- Go to Virtual Machine > Guest > Install/upgrade VMWare Tools
+- Open a login shell
+$ sudo mount /dev/cdrom /mnt
+$ cd /mnt
+$ ls
+$ cp VMWareTools-xxxxxx.tar.gz /tmp
+$ cd /tmp
+$ sudo tar xvzf VMWareTools-xxxxxxxx.tar.gz 
+$ ls
+$ cd vmware-tools-distrib/
+$ ls
+$ sudo ./vmware-install.pl
+$ sudo umount /mnt

@@ -1,0 +1,191 @@
+
+$ sudo vi hostname 
+$ sudo hostname nginx-ubt
+
+$ cd network/
+
+$ sudo vi  interfaces 
+$ sudo service networking restart
+$ ifconfig
+$ ping 33.33.13.10
+
+$ sudo shutdown -r now
+
+$ sudo apt-get install build-essential zlib1g-dev git-core sqlite3 libsqlite3-dev curl -y
+
+$ curl -L https://raw.github.com/fesplugas/rbenv-installer/master/bin/rbenv-installer | bash
+$ vi .bashrc
+ add toward the end
+  	export RBENV_ROOT="${HOME}/.rbenv"
+
+  	if [ -d "${RBENV_ROOT}" ]; then
+  	  export PATH="${RBENV_ROOT}/bin:${PATH}"
+  	  eval "$(rbenv init -)"
+  	fi
+
+$ . .bashrc
+$ which rbenv
+
+$ rbenv version
+
+$ rbenv install --list
+$ rbenv bootstrap-ubuntu-12-04
+$ ruby -v
+$ sudo apt-get install mysql-server
+$ sudo apt-get install imagemagick -y
+$ convert -v
+$ sudo apt-get install libmagickwand-dev
+
+$ sudo apt-get install libmysql-ruby
+$ sudo apt-get install postgresql-dev -y
+
+$ sudo apt-get install libpq-dev
+
+$ psql -V
+
+$ sudo apt-get install libmysql-ruby
+$ sudo apt-get install libmysqlclient-dev
+
+$ gem install mysql2 
+$ sudo apt-get install libcurl4-openssl-dev
+$ sudo apt-get install python-software-properties
+$ sudo add-apt-repository ppa:chris-lea/node.js
+$ sudo apt-get update
+$ sudo apt-get install nodejs
+$ sudo shutdown -h now
+
+$ rbenv install --list
+$ rbenv install 2.0.0-p247
+
+$ rbenv global 2.0.0-p247 
+$ gem install bundler --no-ri --no-rdoc
+
+$ rbenv rehash
+
+$ ll
+$ git clone git://github.com/RailsApps/learn-rails.git
+$ ll
+$ cd learn-rails/
+
+$ rbenv local 2.0.0-p247
+
+$ bundle install
+
+$ vi Gemfile
+
+$ bundle update
+
+$ which rails
+$ rails -v
+$ ruby -v
+
+$ rails s 
+
+
+# install nginx on ubuntu
+# http://www.slashgeek.net/2013/05/08/how-to-get-the-latest-nginx-on-ubuntu-12-04-2-lts-precise-pangolin/
+$ sudo apt-get purge nginx-full nginx-common
+$ dpkg --list  | grep nginx
+$ vi /etc/apt/sources.list
+   add deb http://nginx.org/packages/ubuntu/ quantal nginx
+$ sudo apt-get update
+$ sudo apt-get install nginx
+
+$ sudo service nginx start
+$ cat /etc/resolv.conf 
+$ vi /etc/hosts
+$ sudo vi /etc/hosts
+$ sudo service nginx restart
+$ ping nginx-ubt
+$ cd /etc
+$ ls
+$ cd nginx/
+$ ls
+$ find .
+$ cat ./sites-available/default
+$ history 
+
+$ nginx -V   # see modules available
+
+
+
+
+
+# on red hat
+cd yum.repos.d; vi nginx.repo
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/rhel/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+
+$ yum update 
+
+create $RAILS_ROOT/config/nginx.conf
+ln -s $RAILS_ROOT/config/nginx.conf /etc/nginx/sites-enabled/learn-rails
+rm /etc/nginx/sites-enabled/default
+
+		upstream unicorn {
+		  server unix:/tmp/unicorn.learn-rails.sock fail_timeout=0;
+		}
+
+		server {
+		  listen 3000 default deferred;
+		  #server_name nginx-ubt-rails4.exseed.net;
+		  root /home/vagrant/learn-rails/public;
+
+		  try_files $uri/index.html $uri @unicorn;
+
+		  location @unicorn {
+		    #proxy_pass http://localhost:3000;
+
+		      # an HTTP header important enough to have its own Wikipedia entry:
+		      # http://en.wikipedia.org/wiki/X-Forwarded-For
+		      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+		      # enable this if you forward HTTPS traffic to unicorn,
+		      # this helps Rack set the proper URL scheme for doing redirects:
+		      # proxy_set_header X-Forwarded-Proto $scheme;
+
+		      # pass the Host: header from the client right along so redirects
+		      # can be set properly within the Rack application
+		      proxy_set_header Host $http_host;
+
+		      # we don't want nginx trying to do something clever with
+		      # redirects, we set the Host: header above already.
+		      proxy_redirect off;
+
+
+		    proxy_pass http://unicorn;
+		  }
+
+		  client_max_body_size 4G;
+
+		    # ~2 seconds is often enough for most folks to parse HTML/CSS and
+		    # retrieve needed images/icons/frames, connections are cheap in
+		    # nginx so increasing this is generally safe...
+		    keepalive_timeout 5;
+
+		  error_page 500 502 503 504 /500.html;
+		}
+
+
+# install unicorn
+
+$ vi Gemfile     << add gem 'unicorn'
+$ bundle install
+$ vi config/unicorn.rb
+
+		working_directory "/home/vagrant/learn-rails"
+		pid "/home/vagrant/learn-rails/tmp/pids/unicorn.pid"
+		stderr_path "/home/vagrant/learn-rails/log/unicorn.log"
+		stdout_path "/home/vagrant/learn-rails/log/unicorn.log"
+
+		listen "/tmp/unicorn.learn-rails.sock"
+		worker_processes 2
+		timeout 30
+
+
+$ bundle exec unicorn -c config/unicorn.rb -D
+
+

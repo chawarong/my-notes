@@ -1,0 +1,49 @@
+how-to-jruby.txt
+
+= Use RVM
+$ cd Dropbox/projects
+$ rvm get head
+$ rvm reload
+$ rvm list known
+$ rvm install jruby
+$ git clone git@git.example.com:example/example.git example-jruby
+$ cd everest-jruby
+$ rvm --rvmrc --create use jruby-1.6.8
+$ which ruby
+$ ruby -v
+
+= add the following gems to Gemfile
+
+# to run in ruby mri env.
+platforms :ruby do
+  gem 'mysql2'
+  gem 'thin'
+  gem 'rmagick', '~> 2.13.1'
+end
+
+# to run in jruby env.
+platforms :jruby do
+  gem 'activerecord-jdbcmysql-adapter'
+  gem 'therubyrhino', group: :assets
+  gem 'jruby-openssl'
+  gem 'jruby-lint'
+  gem 'rmagick4j'
+  gem 'warbler'
+  gem 'jruby-rack'
+end
+
+= To check if it's ready to run (check c extension error)
+$ jrlint  
+
+= Change config/database.yml 
+development:
+    adapter: jdbcmysql
+    ...
+
+= Setup app
+$ cd everest-jruby
+$ jruby -S bundle install
+$ jruby -S rake db:create
+$ jruby -S rake db:migrate 
+$ jruby -S rake db:seed
+$ rails s

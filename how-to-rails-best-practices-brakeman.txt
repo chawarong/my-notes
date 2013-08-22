@@ -1,0 +1,6 @@
+how-to-rails-best-practices-brakeman.txt
+gem "brakeman"
+gem "rails_best_practices"
+
+brakeman -o everest-brakeman.html
+rails_best_practices -f html .

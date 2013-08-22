@@ -1,0 +1,167 @@
+how-to-increse-add-disk-space-lvm.txt
+
+- go to add a new disk on vsphere
+- go to the console
+
+$ fdisk -l
+	# Disk /dev/sdb: 21.5 GB, 21474836480 bytes
+	# 255 heads, 63 sectors/track, 2610 cylinders
+	# Units = cylinders of 16065 * 512 = 8225280 bytes
+	# Sector size (logical/physical): 512 bytes / 512 bytes
+	# I/O size (minimum/optimal): 512 bytes / 512 bytes
+	# Disk identifier: 0x00000000
+
+$ fdisk /dev/sdb
+	# Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel
+	# Building a new DOS disklabel with disk identifier 0x20a975fc.
+	# Changes will remain in memory only, until you decide to write them.
+	# After that, of course, the previous content won't be recoverable.
+
+	# Warning: invalid flag 0x0000 of partition table 4 will be corrected by w(rite)
+
+	# WARNING: DOS-compatible mode is deprecated. It's strongly recommended to
+	#          switch off the mode (command 'c') and change display units to
+	#          sectors (command 'u').
+
+	Command (m for help): m
+	# Command action
+	#    a   toggle a bootable flag
+	#    b   edit bsd disklabel
+	#    c   toggle the dos compatibility flag
+	#    d   delete a partition
+	#    l   list known partition types
+	#    m   print this menu
+	#    n   add a new partition
+	#    o   create a new empty DOS partition table
+	#    p   print the partition table
+	#    q   quit without saving changes
+	#    s   create a new empty Sun disklabel
+	#    t   change a partition's system id
+	#    u   change display/entry units
+	#    v   verify the partition table
+	#    w   write table to disk and exit
+	#    x   extra functionality (experts only)
+
+	Command (m for help): n
+	# Command action
+	#    e   extended
+	#    p   primary partition (1-4)
+	p
+	Partition number (1-4): 1
+	# First cylinder (1-2610, default 1):
+	# Using default value 1
+	# Last cylinder, +cylinders or +size{K,M,G} (1-2610, default 2610):
+	# Using default value 2610
+
+	Command (m for help): t
+	Selected partition 1
+	Hex code (type L to list codes): 8e
+	# Changed system type of partition 1 to 8e (Linux LVM)
+
+	Command (m for help): p
+
+	# Disk /dev/sdb: 21.5 GB, 21474836480 bytes
+	# 255 heads, 63 sectors/track, 2610 cylinders
+	# Units = cylinders of 16065 * 512 = 8225280 bytes
+	# Sector size (logical/physical): 512 bytes / 512 bytes
+	# I/O size (minimum/optimal): 512 bytes / 512 bytes
+	# Disk identifier: 0x20a975fc
+
+	#    Device Boot      Start         End      Blocks   Id  System
+	# /dev/sdb1               1        2610    20964793+  8e  Linux LVM
+
+	Command (m for help): w
+	# The partition table has been altered!
+
+	# Calling ioctl() to re-read partition table.
+	# Syncing disks.
+
+$ pvcreate /dev/sdb1
+	  # Writing physical volume data to disk "/dev/sdb1"
+	  # Physical volume "/dev/sdb1" successfully created
+
+$ pvscan
+	  # PV /dev/sda2   VG VolGroup        lvm2 [7.51 GiB / 0    free]
+	  # PV /dev/sdb1                      lvm2 [19.99 GiB]
+	  # Total: 2 [27.50 GiB] / in use: 1 [7.51 GiB] / in no VG: 1 [19.99 GiB]
+
+$ vgextend VolGroup /dev/sdb1
+      # Volume group "VolGroup" successfully extended
+
+$ vgdisplay
+  # --- Volume group ---
+  # VG Name               VolGroup
+  # System ID
+  # Format                lvm2
+  # Metadata Areas        2
+  # Metadata Sequence No  4
+  # VG Access             read/write
+  # VG Status             resizable
+  # MAX LV                0
+  # Cur LV                2
+  # Open LV               2
+  # Max PV                0
+  # Cur PV                2
+  # Act PV                2
+  # VG Size               27.50 GiB
+  # PE Size               4.00 MiB
+  # Total PE              7040
+  # Alloc PE / Size       1922 / 7.51 GiB
+  # Free  PE / Size       5118 / 19.99 GiB
+  # VG UUID               DO3DUx-rBlw-Qi8d-bm0A-ddkx-rkmO-qkFQVe
+
+$ lvdisplay
+  # --- Logical volume ---
+  # LV Path                /dev/VolGroup/lv_root
+  # LV Name                lv_root
+  # VG Name                VolGroup
+  # LV UUID                jU7YtI-91hM-AxqT-yxqq-fbx2-j1HT-Emgwn1
+  # LV Write Access        read/write
+  # LV Creation host, time localhost.localdomain, 2012-11-21 23:35:10 +0700
+  # LV Status              available
+  # # open                 1
+  # LV Size                6.54 GiB
+  # Current LE             1674
+  # Segments               1
+  # Allocation             inherit
+  # Read ahead sectors     auto
+  # - currently set to     256
+  # Block device           253:0
+
+  # --- Logical volume ---
+  # LV Path                /dev/VolGroup/lv_swap
+  # LV Name                lv_swap
+  # VG Name                VolGroup
+  # LV UUID                xkl24z-aJeC-uaoS-7fLt-55XI-HvKS-Ij6y7G
+  # LV Write Access        read/write
+  # LV Creation host, time localhost.localdomain, 2012-11-21 23:35:21 +0700
+  # LV Status              available
+  # # open                 1
+  # LV Size                992.00 MiB
+  # Current LE             248
+  # Segments               1
+  # Allocation             inherit
+  # Read ahead sectors     auto
+  # - currently set to     256
+  # Block device           253:1
+
+
+$ lvextend -L +19G /dev/VolGroup/lv_root
+  # Extending logical volume lv_root to 25.54 GiB
+  # Logical volume lv_root successfully resized
+
+$ resize2fs /dev/VolGroup/lv_root
+	# resize2fs 1.41.12 (17-May-2010)
+	# Filesystem at /dev/VolGroup/lv_root is mounted on /; on-line resizing required
+	# old desc_blocks = 1, new_desc_blocks = 2
+	# Performing an on-line resize of /dev/VolGroup/lv_root to 6694912 (4k) blocks.
+	# The filesystem on /dev/VolGroup/lv_root is now 6694912 blocks long.
+
+$ df -h
+	# Filesystem            Size  Used Avail Use% Mounted on
+	# /dev/mapper/VolGroup-lv_root
+	#                        26G  5.6G   19G  24% /
+	# tmpfs                 939M     0  939M   0% /dev/shm
+	# /dev/sda1             485M   46M  414M  10% /boot
+
+# ubuntu scan new diskhow-to-add-new-disk-to-vm.txt
