@@ -1,4 +1,4 @@
-My how-to repository. Sorry if some text is in non-readable format. 
+This is my how-to repository. If you find it helpful, please endorse me.
 
 -Chawarong
 
