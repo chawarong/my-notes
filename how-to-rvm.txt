@@ -1,3 +1,22 @@
+Install RVM on ubuntu 12.04
+$ sudo adduser deployer
+$ sudo vi /etc/group
+    add deployer to sudo group
+$ sudo su - deployer
+$ sudo visudo
+$ curl -L https://get.rvm.io | bash
+$ vi .bash_profile
+    add source ~/.profile at the end
+$ source /home/deployer/.rvm/scripts/rvm
+
+
+
+To upgrade rvm itself
+rvm get head
+rvm reload
+rvm list known
+rvm list remote << see available ruby binaries to be downloaded from remote
+
 cd [app_name]
 rvm install 1.9.3-head
 rvm --rvmrc --create use 1.9.3-head@script-runner
