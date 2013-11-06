@@ -1,2 +1,16 @@
 see the most commit files
 git rev-list --objects --all | awk '"" != $2' | sort -k2 | uniq -cf1 | sort -k1,1n
+
+
+git log --since="10.days" --pretty=oneline
+
+
+git log --author="developer1" --pretty=tformat: --numstat | gawk '{ add += $1 ; subs += $2 ; loc += $1 - $2 } END { printf "added lines: %s removed lines : %s total lines: %s\n",add,subs,loc }' -
+
+
+git log --since="1.days" --pretty=oneline | cut -d" " -f 1 | xargs -I {} git show --pretty="format:" --name-only {} | xargs -t -I {} ../cloc --by-file --sum-one {}
+../cloc --by-file app/controllers/reports_controller.rb
+
+
+# find out file types in the project sorted by count number
+find . | awk -F . '{if (NF>1) {print $NF}}' | grep -v '^/' | grep -v ^git | sort -k1,1n | uniq -c | sort -k1,1n

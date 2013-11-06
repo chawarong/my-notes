@@ -1,4 +1,12 @@
 how-to-cucumber-rails.txt
+
+Run cucumber for foster
+$ bundle install
+$ fix database.yml to have quotes "1234"
+$ cucumber
+
+
+
 git clone git@git.atelas.com:everest/everest.git everest-cucumber
 git checkout develop
 cd everest-cucumber/
@@ -30,6 +38,7 @@ rake cucumber
     << means replace the content of the alias node (YML) to this line
 
 -- everytime rake cucumber is executed, it deletes the database and copy schema structures from development db without "ANY DATA" to make sure that db is in pristine state.
+   Note: see lib/tasks/cucumber.rake -- you will see it runs "rake db:test:prepare"
 
 -- one way is to seed data everytime, add to features/support/env.rb
   
@@ -37,3 +46,4 @@ rake cucumber
 
 FOR REFERRENCE ONLY
 http://stackoverflow.com/questions/3049800/ruby-on-rails-cucumber-how-to-reset-the-db-after-each-scenario
+http://stackoverflow.com/questions/1574797/how-to-load-dbseed-data-into-test-database-automatically/1998520#1998520

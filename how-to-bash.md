@@ -27,6 +27,15 @@ which basically gets discarded.
 
 		$ lsof -i
 
+		COMMAND    PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+		dropbox   2749 songserm   24u  IPv4 743438      0t0  TCP songserm-ubt.local:32899->snt-re2-8c.sjc.dropbox.com:http (ESTABLISHED)
+		dropbox   2749 songserm   29u  IPv4  15602      0t0  UDP *:17500 
+		dropbox   2749 songserm   32u  IPv4  15605      0t0  TCP *:17500 (LISTEN)
+		ubuntu-ge 2849 songserm    7u  IPv4  15155      0t0  TCP songserm-ubt.local:59924->mistletoe.canonical.com:http (ESTABLISHED)
+		unity-sco 3046 songserm   12u  IPv4  15662      0t0  TCP songserm-ubt.local:54618->alkes.canonical.com:http (ESTABLISHED)
+		unity-sco 3046 songserm   14u  IPv4  15663      0t0  TCP songserm-ubt.local:54619->alkes.canonical.com:http (ESTABLISHED)
+
+
 		# small cheat sheet
 		$ lsof -h
 
@@ -73,4 +82,19 @@ which basically gets discarded.
 
 The buffers number represents in-memory blocks that result from the kernel accessing the disk, such as when the kernel needs to read the contents of files. The cached figure tells us how much RAM is being used to cache the content of recently read files. The buffer figure increases when the file system layer is bypassed while the cache grows when the file system is used. Both grow as read operations increase.
 
+#### Generate a timestamp in various way
 
+		$ date +"%Y%m%d%H%M%S"
+		20131010102451
+
+		$ date +"%Y-%m-%d %H:%M:%S"
+		2013-10-10 10:24:34
+
+		$ date --date='@1374000050' +"%Y-%m-%d %H:%M:%S"
+		2013-07-17 01:40:50
+
+
+#### run a command on behalf on other user 
+
+		$ su - chawarong -c 'whoami'
+		$ su - chawarong -c 'cmd1 & cmd2'
