@@ -18,6 +18,6 @@ add this line before the last "end"
 +  end
 
 mkdir -p ./tmp/miniprofiler
-chmod -R 777 ./tmp
+chmod -R 777 ./tmp/miniprofiler
 
 restart server

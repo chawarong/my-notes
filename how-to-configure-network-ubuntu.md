@@ -1,11 +1,19 @@
 how-to-configure-network-ubuntu.md
 
 ### Configure network using init networking (text mode)
-/etc/network/interfaces
 
-12.04 or later
+To configure networking with text mode, first you need to remove networking config from network-manager (GUI)
+
+
+        /etc/network/interfaces
+
+12.04 or 13.04 
 
 		$ sudo /etc/init.d/networking restart 
+
+13.10
+   
+        $ sudo service networking restart 
 
 Normally dns-* option in /etc/resolv.conf can be configured in
 /etc/network/interfaces. Don't need to specify it in /etc/resolvconf/resolv.conf.d 

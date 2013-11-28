@@ -1,7 +1,52 @@
-how-to-increse-add-disk-space-lvm.txt
+how-to-increse-add-disk-space-lvm.md
 
-- go to add a new disk on vsphere
-- go to the console
+This post contains an instructuion how to increase disk space on a linux server on VMWare VCenter.  
+You don't need to shutdown the server. It can be performed live!
+
+1. go to add a new disk on VMWare VSphere client with thin provisioning and using SCSI (0:1) node
+2. go to the machine's console
+
+```sh
+
+$ cat /proc/partitions           ;# to see the current partition list
+$ sudo apt-get install scsitools ;# install scsitools to scan the new disk
+$ dpkg -L scsitools              ;# to see where tool's path
+$ sudo /sbin/rescan-scsi-bus     ;# scan new disk
+	/sbin/rescan-scsi-bus: line 592: [: 1.03: integer expression expected
+	Host adapter 0 (ata_piix) found.
+	Host adapter 1 (ata_piix) found.
+	Host adapter 2 (mptspi) found.
+	Scanning SCSI subsystem for new devices
+	Scanning host 0 for  SCSI target IDs  0 1 2 3 4 5 6 7, all LUNs
+	Scanning host 1 for  SCSI target IDs  0 1 2 3 4 5 6 7, all LUNs
+	Scanning for device 1 0 0 0 ... 
+	OLD: Host: scsi1 Channel: 00 Id: 00 Lun: 00
+	      Vendor: NECVMWar Model: VMware IDE CDR10 Rev: 1.00
+	      Type:   CD-ROM                           ANSI SCSI revision: 05
+	Scanning host 2 for  SCSI target IDs  0 1 2 3 4 5 6 7, all LUNs
+	Scanning for device 2 0 0 0 ... 
+	OLD: Host: scsi2 Channel: 00 Id: 00 Lun: 00
+	      Vendor: VMware   Model: Virtual disk     Rev: 1.0 
+	      Type:   Direct-Access                    ANSI SCSI revision: 02
+	Scanning for device 2 0 1 0 ...            
+	NEW: Host: scsi2 Channel: 00 Id: 01 Lun: 00     
+	      Vendor: VMware   Model: Virtual disk     Rev: 1.0 
+	      Type:   Direct-Access                    ANSI SCSI revision: 02
+	1 new device(s) found.                     
+	0 device(s) removed.  
+
+$ cat /proc/partitions          ;# sdb is the new disk listed here
+	major minor  #blocks  name
+
+	  11        0      65882 sr0
+	   8        0   16777216 sda
+	   8        1     248832 sda1
+	   8        2          1 sda2
+	   8        5   16525312 sda5
+	 252        0   12308480 dm-0
+	 252        1    4190208 dm-1
+	   8       16   52428800 sdb
+
 
 $ fdisk -l
 	# Disk /dev/sdb: 21.5 GB, 21474836480 bytes
@@ -9,8 +54,14 @@ $ fdisk -l
 	# Units = cylinders of 16065 * 512 = 8225280 bytes
 	# Sector size (logical/physical): 512 bytes / 512 bytes
 	# I/O size (minimum/optimal): 512 bytes / 512 bytes
-	# Disk identifier: 0x00000000
+	# Disk identifier: 0x00000000                          <<<<< notice! there's no id.
 
+```
+
+###### perform fdisk to add a new disk
+If the newly added disk is not there, just reboot.
+
+```sh
 $ fdisk /dev/sdb
 	# Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel
 	# Building a new DOS disklabel with disk identifier 0x20a975fc.
@@ -65,7 +116,7 @@ $ fdisk /dev/sdb
 	# Units = cylinders of 16065 * 512 = 8225280 bytes
 	# Sector size (logical/physical): 512 bytes / 512 bytes
 	# I/O size (minimum/optimal): 512 bytes / 512 bytes
-	# Disk identifier: 0x20a975fc
+	# Disk identifier: 0x20a975fc                                <<<<< notice! there's an id.
 
 	#    Device Boot      Start         End      Blocks   Id  System
 	# /dev/sdb1               1        2610    20964793+  8e  Linux LVM
@@ -75,15 +126,32 @@ $ fdisk /dev/sdb
 
 	# Calling ioctl() to re-read partition table.
 	# Syncing disks.
+```
 
+###### Create a PV
+Tip: `man lvm` to see the definition of each commands
+
+```sh
 $ pvcreate /dev/sdb1
 	  # Writing physical volume data to disk "/dev/sdb1"
 	  # Physical volume "/dev/sdb1" successfully created
+
+      ....Verify if the PV is created.
+
+$ pvdisplay
+      # ... should see sdb1
 
 $ pvscan
 	  # PV /dev/sda2   VG VolGroup        lvm2 [7.51 GiB / 0    free]
 	  # PV /dev/sdb1                      lvm2 [19.99 GiB]
 	  # Total: 2 [27.50 GiB] / in use: 1 [7.51 GiB] / in no VG: 1 [19.99 GiB]
+```
+
+###### Add a PV to a VG
+
+```sh
+$ vgdisplay
+  # ... should see VG Name [something]
 
 $ vgextend VolGroup /dev/sdb1
       # Volume group "VolGroup" successfully extended
@@ -144,9 +212,16 @@ $ lvdisplay
   # Read ahead sectors     auto
   # - currently set to     256
   # Block device           253:1
+```
+Notice LV Path
 
+$ lvextend [lv path] /dev/sdb1        ;# tries to extend the size of that logical volume by 
+                                      ;# the amount of  free  space  on physical volume /dev/sdb1.  
+                                      ;# This is equivalent to specifying "-l +100%PVS" on the command line.
+or
 
 $ lvextend -L +19G /dev/VolGroup/lv_root
+
   # Extending logical volume lv_root to 25.54 GiB
   # Logical volume lv_root successfully resized
 
@@ -164,4 +239,5 @@ $ df -h
 	# tmpfs                 939M     0  939M   0% /dev/shm
 	# /dev/sda1             485M   46M  414M  10% /boot
 
-# ubuntu scan new diskhow-to-add-new-disk-to-vm.txt
+```
+

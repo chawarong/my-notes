@@ -1,12 +1,53 @@
 On Ubuntu 12.04
 
+# change ip address
+$ cd /etc/network
+$ sudo vi interfaces
+  add >>
+	auto lo
+	iface lo inet loopback
+
+	# The primary network interface
+	auto eth0
+	iface eth0 inet static
+	  address 10.225.21.223
+	  netmask 255.255.255.0
+	  gateway 10.225.21.1
+
+# change resolv.conf
+$ vi /etc/network/interfaces
+   add the following to an interface 
+     dns-nameserver x.x.x.x 
+     dns-search exseed.net
+
+# Ioptional) if some dns option is needed 
+$ cd /etc/resolvconf/resolvconf
+$ sudo vi tail 
+  e.g. add >> 
+    options inet6 
+$ sudo resolvconf -u
+
+# add a deploy user
+$ adduser songserm
+= add this line to /etc/sudoers 
+=    songserm ALL=(ALL) NOPASSWD: ALL
+or even better
+     songserm 
+
+login without password
+(optional - on vbox) ssh-keygen -t rsa
+(optional - on vbox) cat .ssh/id_rsa.pub | ssh root@everest1 'cat >> .ssh/authorized_keys'
+
+
 sudo apt-get update 
 
 sudo apt-get install build-essential bison openssl libncurses5-dev libreadline6 libreadline6-dev curl git-core git-gui zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake
+(or just enough: sudo apt-get install build-essential zlib1g-dev git-core sqlite3 libsqlite3-dev curl)
+
 
 sudo apt-get install ruby1.9.1 ruby1.9.1-dev
 
-gem install rails
+sudo gem install rails
 
 apt-get install apache2
 
@@ -26,12 +67,34 @@ apt-get install libcurl4-openssl-dev
 
 apt-get install apache2-prefork-dev
 
-passenger-install-apache2-module 
+gem install passenger
+
+passenger-insextall-apache2-module 
+(then copy 3 lines to apache2.conf)
 
 sudo apt-get install python-software-properties
 sudo add-apt-repository ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get install nodejs
+
+# RMagick
+sudo apt-get install imagemagick -y
+sudo apt-get install libmagickwand-dev
+sudo gem install rmagick
+
+
+# for capistrano sftp
+#??? sudo apt-get install vsftpd
+= vi /etc/ssh/sshd_config
+= add this line to the bottom
+= Subsystem       sftp    /usr/lib/openssh/sftp-server
+service ssh restart
+chown songserm:songserm -R /var/www/everest
+cap deploy:setup
+cap deploy:cold
+(error on deploy:migrate)
+cap ...
+
 
 add these to /etc/apache2/site-available/default
 - change port of default config (80) to port 81
@@ -43,13 +106,15 @@ Listen 81
 - add port 80
 
 <VirtualHost *:80>
-  DocumentRoot "/var/www/everest/public"
+  DocumentRoot "/var/www/everest/current/public"
   RailsEnv production
-  <Directory "/var/www/everest/public">
+  <Directory "/var/www/everest/current/public">
     AllowOverride all
     Options -MultiViews
   </Directory>
 </VirtualHost>
+
+= go to setup SSL, see how-to-config-ssl-on-rails.txt
 
 service apache2 stop
 
@@ -64,6 +129,46 @@ rake assets:precomplie
 
 service apache2 start
 
+apt-get install unzip
 
 
+++++++ Deploy manaully +++++++
+(on vbox) cd Dropbox/projects/everest
+(on vbox) git checkout db/schema.rb
+(on vbox) git pull
+(on vbox) git archive --format zip --output ../everest-20120908.zip develop
+(on vbox) cd .. 
+(on vbox) scp everest-20120908.zip root@everest1:/var/www
+service apache2 stop
+mv everest everest-20120908
+unzip -d everest everest-20120908.zip
+=change database.yml password
+bundle install
+=change seeds path
+rake db:migrate VERSION=0 RAILS_ENV=production
+rake db:migrate RAILS_ENV=production
+rake db:seed RAILS_ENV=production
+rake assets:clean RAILS_ENV=production
+rake assets:precomplie
+chmod -R 777 tmp log
+service apache2 start
 
+= Install rackup private_pub.ru -s thin -E production
+cd /var/www/everest/current/script 
+vi kmp-faye.conf    <<< change the path to rails e.g. /var/www/everest/current
+sudo cp kmp-faye.conf /etc/init/
+sudo service kmp-faye start
+sudo mkdir -p /var/log/kmp
+sudo chmod 777 /var/log/kmp
+sudo touch /var/log/kmp/faye.log
+
+++++++ Deploy capistrano +++++++
+git pull origin develop
+= change seeds to be either development or production
+rm -rf /tmp/everest
+cap deploy
+
+++++++ Turn on logging ++++++
+Note: if want to turn on log debug level, vi config/environments/production.rb >> uncomment log section
+  config.consider_all_requests_local       = true
+  config.action_controller.perform_caching = false

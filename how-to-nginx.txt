@@ -1,4 +1,9 @@
 
+Install nginx on Ubuntu 13.10
+
+		$ sudo apt-get install nginx
+
+
 $ sudo vi hostname 
 $ sudo hostname nginx-ubt
 
@@ -84,10 +89,104 @@ $ rails s
 
 # install nginx on ubuntu
 # http://www.slashgeek.net/2013/05/08/how-to-get-the-latest-nginx-on-ubuntu-12-04-2-lts-precise-pangolin/
+#
+# spdy comes with nginx out of the box
+# nginx w/ spdy requires openssl 1.0.1 (ubuntu 12.04 or later is OK.) 
+# otherwise, it won't build with spdy flag
+# check with http://www.openssl.org/
+# and https://xkyle.com/getting-started-with-spdy-on-nginx/
+# example of nginx w/ spdy,
+# note: use this command to see compiled modules of nginx
+#
+# $ nginx -V
+	# nginx version: nginx/1.4.1
+	# built by gcc 4.7.2 (Ubuntu/Linaro 4.7.2-2ubuntu1) 
+	# TLS SNI support enabled
+	# configure arguments: 
+	# --prefix=/etc/nginx 
+	# --sbin-path=/usr/sbin/nginx 
+	# --conf-path=/etc/nginx/nginx.conf 
+	# --error-log-path=/var/log/nginx/error.log 
+	# --http-log-path=/var/log/nginx/access.log 
+	# --pid-path=/var/run/nginx.pid 
+	# --lock-path=/var/run/nginx.lock 
+	# --http-client-body-temp-path=/var/cache/nginx/client_temp 
+	# --http-proxy-temp-path=/var/cache/nginx/proxy_temp 
+	# --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp 
+	# --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp 
+	# --http-scgi-temp-path=/var/cache/nginx/scgi_temp 
+	# --user=nginx 
+	# --group=nginx 
+	# --with-http_ssl_module 
+	# --with-http_realip_module 
+	# --with-http_addition_module 
+	# --with-http_sub_module 
+	# --with-http_dav_module 
+	# --with-http_flv_module 
+	# --with-http_mp4_module 
+	# --with-http_gunzip_module 
+	# --with-http_gzip_static_module 
+	# --with-http_random_index_module 
+	# --with-http_secure_link_module 
+	# --with-http_stub_status_module 
+	# --with-mail 
+	# --with-mail_ssl_module 
+	# --with-file-aio 
+	 --with-http_spdy_module 
+	# --with-ipv6
+
+
+# WARNING: THIS IS THE WRONG CONFIGURATION ###########
+# This is what you will get when you install from apt-get (ubuntu 13.10), so don't use it. There's no spdy!!!
+	# --prefix=/usr/share/nginx 
+	# --conf-path=/etc/nginx/nginx.conf 
+	# --error-log-path=/var/log/nginx/error.log 
+	# --http-client-body-temp-path=/var/lib/nginx/body 
+	# --http-fastcgi-temp-path=/var/lib/nginx/fastcgi 
+	# --http-log-path=/var/log/nginx/access.log 
+	# --http-proxy-temp-path=/var/lib/nginx/proxy 
+	# --http-scgi-temp-path=/var/lib/nginx/scgi 
+	# --http-uwsgi-temp-path=/var/lib/nginx/uwsgi 
+	# --lock-path=/var/lock/nginx.lock 
+	# --pid-path=/run/nginx.pid 
+	# --with-pcre-jit 
+	# --with-debug 
+	# --with-http_addition_module 
+	# --with-http_dav_module 
+	# --with-http_geoip_module 
+	# --with-http_gzip_static_module 
+	# --with-http_image_filter_module 
+	# --with-http_realip_module 
+	# --with-http_stub_status_module 
+	# --with-http_ssl_module 
+	# --with-http_sub_module 
+	# --with-http_xslt_module 
+	# --with-ipv6 
+	# --with-mail 
+	# --with-mail_ssl_module 
+	# --add-module=/build/buildd/nginx-1.4.1/debian/modules/nginx-auth-pam 
+	# --add-module=/build/buildd/nginx-1.4.1/debian/modules/nginx-dav-ext-module 
+	# --add-module=/build/buildd/nginx-1.4.1/debian/modules/nginx-echo 
+	# --add-module=/build/buildd/nginx-1.4.1/debian/modules/nginx-upstream-fair 
+	# --add-module=/build/buildd/nginx-1.4.1/debian/modules/ngx_http_substitutions_filter_module
+
 $ sudo apt-get purge nginx-full nginx-common
+
+#
+# apt-get remove
+#            remove is identical to install except that packages are removed instead of installed. Note the removing a package leaves its configuration files in system. If a plus sign is appended to the package name (with no
+#            intervening space), the identified package will be installed instead of removed.
+
+# apt-get purge
+#            purge is identical to remove except that packages are removed and purged (any configuration files are deleted too).
+# 
+# apt-get remove --purge is identical to apt-get purge
+# 
+
 $ dpkg --list  | grep nginx
 $ vi /etc/apt/sources.list
    add deb http://nginx.org/packages/ubuntu/ quantal nginx
+$ wget -q http://nginx.org/keys/nginx_signing.key -O- | sudo apt-key add -
 $ sudo apt-get update
 $ sudo apt-get install nginx
 
@@ -107,10 +206,6 @@ $ history
 
 $ nginx -V   # see modules available
 
-
-
-
-
 # on red hat
 cd yum.repos.d; vi nginx.repo
 [nginx]
@@ -125,46 +220,103 @@ create $RAILS_ROOT/config/nginx.conf
 ln -s $RAILS_ROOT/config/nginx.conf /etc/nginx/sites-enabled/learn-rails
 rm /etc/nginx/sites-enabled/default
 
-		upstream unicorn {
-		  server unix:/tmp/unicorn.learn-rails.sock fail_timeout=0;
+		upstream puma {
+		  server unix:/tmp/nginx.puma.appname.sock fail_timeout=0;
 		}
 
+		# redirect http to https
+		# Normally don't need it in case of Rails app
+		# The following options will take care of it
+		#    "proxy_set_header X-Forwarded-Proto $scheme;" in nginx config
+		#    "config.force_ssl = true" in RAILS_ROOT/config/environments/production.rb 
+		# You can use it if the 2 options above are not set.
+		# 
+		#server {
+		#
+		#  listen 80;
+		#  server_name dam.atelas.com;
+		#  rewrite        ^ https://$server_name$request_uri? permanent;
+		#
+		#}
+
 		server {
-		  listen 3000 default deferred;
-		  #server_name nginx-ubt-rails4.exseed.net;
-		  root /home/vagrant/learn-rails/public;
 
-		  try_files $uri/index.html $uri @unicorn;
+     	  listen 80;
+		  listen 443 ssl spdy;
+		  server_name appname.atelas.com;
 
-		  location @unicorn {
-		    #proxy_pass http://localhost:3000;
+          # In case of using other port
+		  # listen 3000 default deferred;
+
+		  # App path 
+		  root /var/www/appname/current/public;
+		  try_files $uri/index.html $uri @puma;
+
+		  # SSL config
+		  ssl_certificate /etc/ssl/certs/all.domains.crt;
+		  ssl_certificate_key /etc/ssl/private/all.domains.key;
+		  ssl_protocols SSLv3 TLSv1;
+		  ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
+		  ssl_prefer_server_ciphers on;
+
+
+		  location @puma {
 
 		      # an HTTP header important enough to have its own Wikipedia entry:
 		      # http://en.wikipedia.org/wiki/X-Forwarded-For
+		  	  # http://wiki.nginx.org/HttpProxyModule#proxy_set_header
+		  	  # It forwards client's ip in the X-Forwarded-For header to Rack app instead of the proxy ip
 		      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-		      # enable this if you forward HTTPS traffic to unicorn,
-		      # this helps Rack set the proper URL scheme for doing redirects:
-		      # proxy_set_header X-Forwarded-Proto $scheme;
 
 		      # pass the Host: header from the client right along so redirects
 		      # can be set properly within the Rack application
 		      proxy_set_header Host $http_host;
+  
+              # http://stackoverflow.com/questions/9448168/why-am-i-getting-infinite-redirect-loop-with-force-ssl-in-my-rails-app
+			  # You're not forwarding any information about whether this request was an HTTPS-terminated request or not. Normally, 
+			  # in a server, the "ssl on;" directive will set these headers, but you're using a combined block.
+   			  # Rack (and force_ssl) determines SSL by:
+			  #     If the request came in on port 443 (this is likely not being passed back to Unicorn from nginx)
+			  #     If ENV['HTTPS'] == "on"
+			  #     If the X-Forwarded-Proto header == "HTTPS"
+			  # See the force_ssl source for the full story.
+			  # Since you're using a combined block, you want to use the third form. Try:
+			  # proxy_set_header X-Forwarded-Proto $scheme;
+			  # in your server or location block per the nginx documentation.
+			  # This will set the header to "http" when you come in on a port 80 request, and set it to "https" when you come in on a 443 request.
+			  #
+		      # So, enable this if you forward HTTPS traffic to unicorn,
+		      # this helps Rack set the proper URL scheme for doing redirects:
+		      proxy_set_header X-Forwarded-Proto $scheme;
+
+              # This directive sets the read timeout for the response of the proxied server. 
+              # It determines how long nginx will wait to get the response to a request. 
+              # Set it if you update a huge file, so it won't give you 504 Gateway Timeout.
+		      proxy_read_timeout  600;
+              proxy_connect_timeout 600;
 
 		      # we don't want nginx trying to do something clever with
 		      # redirects, we set the Host: header above already.
 		      proxy_redirect off;
 
-
-		    proxy_pass http://unicorn;
+              # The destination this proxy will redirect the client traffic
+              # Normally, it's the upstream block above.
+              # You can also uses, domain name and port like this "proxy_pass http://localhost:3000;"
+              proxy_pass http://puma;
 		  }
 
+          access_log /var/log/nginx/access_log_appname.log;
+
+          # Specifies the maximum accepted body size of a client request, as indicated by the request header Content-Length.
+          # If the stated content length is greater than this size, then the client receives 
+          # the HTTP error code 413 ("Request Entity Too Large").  
+          # set to 0 to disable.
 		  client_max_body_size 4G;
 
-		    # ~2 seconds is often enough for most folks to parse HTML/CSS and
-		    # retrieve needed images/icons/frames, connections are cheap in
-		    # nginx so increasing this is generally safe...
-		    keepalive_timeout 5;
+		  # ~2 seconds is often enough for most folks to parse HTML/CSS and
+		  # retrieve needed images/icons/frames, connections are cheap in
+		  # nginx so increasing this is generally safe...
+		  keepalive_timeout 5;
 
 		  error_page 500 502 503 504 /500.html;
 		}
@@ -188,4 +340,41 @@ $ vi config/unicorn.rb
 
 $ bundle exec unicorn -c config/unicorn.rb -D
 
+# Redirect all http traffics to https
+server {
 
+  listen 80;
+  server_name monei.exseed.net;
+  rewrite        ^ https://$server_name$request_uri? permanent;
+
+}
+
+server {
+
+	listen 443;
+	...
+}
+
+# TIPS 
+# - location @abc <-- @ is a named location, referred by try_files
+# - only 1 listen xx default deffered;  
+# - to make a index of files like apache does for sun.exseed.net:81/apk just add "autoindex on"
+#     server {
+
+#         listen 81;
+#         server_name sun.exseed.net;
+
+#         location / {
+#                 autoindex on;
+#                 # default tis off (GMT time)
+#    			  autoindex_localtime on;        
+#                 root /var/www/apk;
+#                 index index.html index.htm;
+#         }
+
+#         error_page   500 502 503 504  /50x.html;
+#         location = /50x.html {
+#                 root   /usr/share/nginx/html;
+#         }
+
+# }

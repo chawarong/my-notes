@@ -1,7 +1,7 @@
 How to use bash shell (tips & tricks)
 =====================================
 
-#### List all cron in the system
+#### List all cron jobs of all users in the system 
 You would have to run this as root, but:
 
 		$ for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l; done
@@ -19,9 +19,12 @@ which basically gets discarded.
 		$ dd if=/dev/zero of=/dev/null
 
 
-#### Write a file huge file until disk is full.
+#### Write a huge file until disk space is full.
 
 		$ dd if=/dev/zero of=/tmp/hugefile
+
+		To specify filesize
+		$ dd if=/dev/zero of=/tmp/hugefile bs=700000000 count=1       ;# will write a 700MB file
 
 #### Find out network connection usage
 
@@ -53,7 +56,9 @@ which basically gets discarded.
 
 #### Buffer & cache in Linux memory usage
 
-[source](http://www.itworld.com/it-managementstrategy/280695/making-sense-memory-usage-linux?page=0,2)
+The buffers number represents in-memory blocks that result from the kernel accessing the disk, such as when the kernel needs to read the contents of files. The cached figure tells us how much RAM is being used to cache the content of recently read files. The buffer figure increases when the file system layer is bypassed while the cache grows when the file system is used. Both grow as read operations increase.
+
+For more details, you can visit this [link](http://www.itworld.com/it-managementstrategy/280695/making-sense-memory-usage-linux?page=0,2)
 
 		top - 18:54:11 up 38 days, 19:58,  7 users,  load average: 0.02, 0.01, 0.00
 		Tasks: 181 total,   1 running, 179 sleeping,   1 stopped,   0 zombie
@@ -80,7 +85,6 @@ which basically gets discarded.
 		   15 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 events/1
 		   16 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 events/2
 
-The buffers number represents in-memory blocks that result from the kernel accessing the disk, such as when the kernel needs to read the contents of files. The cached figure tells us how much RAM is being used to cache the content of recently read files. The buffer figure increases when the file system layer is bypassed while the cache grows when the file system is used. Both grow as read operations increase.
 
 #### Generate a timestamp in various way
 
@@ -94,7 +98,31 @@ The buffers number represents in-memory blocks that result from the kernel acces
 		2013-07-17 01:40:50
 
 
-#### run a command on behalf on other user 
+#### Run a command on behalf on other user 
 
 		$ su - chawarong -c 'whoami'
 		$ su - chawarong -c 'cmd1 & cmd2'
+
+
+#### Set vim as a default editor in ubuntu 
+
+		$ sudo update-alternatives --set editor /usr/bin/vim.basic
+	
+#### Walk into each releases folder and do git status
+
+        $ listdir=`ls`
+        $ for l in $listdir ; do cd /var/www/my_rails_app/releases/$l; pwd; git status; done
+
+        # look for modified deploy.rb 
+        $ for l in $listdir ; do cd /var/www/my_rails_app/releases/$l; pwd; git status; done | grep deploy.rb
+
+#### To remove a user completely along with their home directory
+
+        $ sudo deluser --remove-home chawarong
+
+#### To remove a service 
+
+        $ sudo service --status-all
+        $ cd /etc
+        $ ll rc* | less                              ;# S is start, K is kill
+        $ sudo update-rc.d -f nscd remove

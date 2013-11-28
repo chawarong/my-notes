@@ -70,8 +70,9 @@ Troubleshooting
 	An entry in the hosts file is usually sufficient for me.
 
 * Check with firewall and SELinux
-		$ iptables -L
-		$ getenforce
+
+		$ iptables -L  
+		$ getenforce  
 
 * On Mac client, it connects to NFS using insecure port. Using the insecure option allows clients such as Mac OS X to connect on insecure ports.
   [link](http://blogaristoo.lqx.net/index.php/mounting-a-linux-nfs-server-on-mac-os-x-10-6)

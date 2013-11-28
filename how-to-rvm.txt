@@ -9,7 +9,10 @@ $ vi .bash_profile
     add source ~/.profile at the end
 $ source /home/deployer/.rvm/scripts/rvm
 
-
+$ rvm use 1.9.3 --create
+$ rvm gemset create onleave --create
+$ vi .ruby-version  << 1.9.3
+$ vi .gemset     << onleave
 
 To upgrade rvm itself
 rvm get head
